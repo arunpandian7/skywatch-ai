@@ -3,19 +3,19 @@ from pathlib import Path
 import gdown
 from functools import partial
 
-from keras.models import Model
-from keras.layers import Activation
-from keras.layers import BatchNormalization
-from keras.layers import Concatenate
-from keras.layers import Conv2D
-from keras.layers import Dense
-from keras.layers import Dropout
-from keras.layers import GlobalAveragePooling2D
-from keras.layers import Input
-from keras.layers import Lambda
-from keras.layers import MaxPooling2D
-from keras.layers import add
-from keras import backend as K
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Activation
+from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.layers import Concatenate
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.keras.layers import Input
+from tensorflow.keras.layers import Lambda
+from tensorflow.keras.layers import MaxPooling2D
+from tensorflow.keras.layers import add
+from tensorflow.keras import backend as K
 
 def scaling(x, scale):
 	return x * scale
@@ -535,17 +535,22 @@ def loadModel(url = 'https://drive.google.com/uc?id=1971Xk5RwedbudGgTIrGAL4F7Aif
 	
 	#-----------------------------------
 	
-	home = str(Path.home())
+	home = Path.home()
 	
-	if os.path.isfile('./weights/facenet_weights.h5') != True:
+	save_dir = os.path.join(home, '.skywatchai/weights')
+	file_path = os.path.join(home, '.skywatchai/weights/facenet_weights.h5')
+
+	if os.path.isfile(file_path) != True:
 		print("facenet_weights.h5 will be downloaded...")
 		
-		output = './weights/facenet_weights.h5'
-		gdown.download(url, output, quiet=False)
+		if os.path.isdir(save_dir) != True:
+			os.makedirs(save_dir)
+
+		gdown.download(url, file_path, quiet=False)
 	
 	#-----------------------------------
 	
-	model.load_weights('./weights/facenet_weights.h5')
+	model.load_weights(file_path)
 	
 	#-----------------------------------
 	
