@@ -1,2 +1,6 @@
 .vscode
 .venv
+.empty
+.ipynb_checkpoints
+*.pyc
+*.pyo
