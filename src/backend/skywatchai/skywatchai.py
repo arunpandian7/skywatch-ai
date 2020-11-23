@@ -1,10 +1,12 @@
-import .MTCNN
-import .FaceNet
+from mtcnn import MTCNN
+from .FaceNet import loadModel
 from .utils import getEuclideanDistance
 
 import numpy as np
 import math
 from PIL import Image
+import cv2
+
 
 def align_face(img, left_eye, right_eye):
     # Alignment is done by rotation with respect to Left and Right Eye
@@ -38,7 +40,7 @@ def align_face(img, left_eye, right_eye):
         img = np.array(img.rotate(direction * angle))
     return img
 
-def crop_face(img):
+def crop_face(img, enforce=True):
     detector = MTCNN() 
     detections = detector.detect_faces(img) # Detects Face 
 
@@ -56,5 +58,15 @@ def crop_face(img):
         cropped_face = img[int(y): int(y+h), int(x) : int(x+w)]
         return cropped_face
     else:
+        if enforce != True:
+            return img
         raise ValueError('Face could not be detected please check the image.')
 
+def get_processed_face(img, target_size, enforce=True):
+    img = crop_face(img, enforce=enforce)
+
+    processed_img = cv2.resize(img, target_size)
+    processed_img = np.expand_dims(processed_img, axis=0)
+    processed_img = processed_img / 255
+
+    return processed_img
