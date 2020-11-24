@@ -1,5 +1,5 @@
 .vscode
-.venv
+.env
 .empty
 .ipynb_checkpoints
 *.pyc
