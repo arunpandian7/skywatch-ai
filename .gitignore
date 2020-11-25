@@ -5,3 +5,4 @@
 *.pyc
 *.pyo
 test-notebook.ipynb
+database/**/*.jpg
