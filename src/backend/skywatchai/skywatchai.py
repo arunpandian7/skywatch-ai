@@ -1,12 +1,18 @@
 from mtcnn import MTCNN
 from .FaceNet import loadModel
-from .utils import getEuclideanDistance
+from .utils import getEuclideanDistance, read_img, l2_normalization
 
 import numpy as np
 import math
 from PIL import Image
 import cv2
 
+model = loadModel()
+input_shape = model.layers[0].input_shape
+try:
+    image_size = input_shape[0][1:3]
+except:
+    image_size = input_shape[1:3]
 
 def align_face(img, left_eye, right_eye):
     # Alignment is done by rotation with respect to Left and Right Eye
@@ -70,3 +76,10 @@ def get_processed_face(img, target_size, enforce=True):
     processed_img = processed_img / 255
 
     return processed_img
+
+def get_face_embedding(path):
+    img = read_img(path)
+    processed_img = get_processed_face(img, image_size, enforce=True)
+    embedding = l2_normalization(model.predict(processed_img)[0, :])
+    return embedding
+

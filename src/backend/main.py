@@ -10,6 +10,9 @@ import argparse
 import os
 import glob
 
+from numpy.lib.type_check import imag
+from skywatchai.SkywatchAI import get_face_embedding
+
 def get_names(dir):
     try:
         names = os.listdir(dir)
@@ -29,11 +32,21 @@ def get_person_images(dir, names):
         image_data[name].extend(glob.glob(person_img_path+'/*.png'))
     return image_data
 
+def create_embedding_data(dir, names):
+    image_data = get_person_images(dir, names)
+    embedding_data = {}
+    for person in image_data.keys():
+        embedding_data[person] = list()
+        for image in image_data[person]:
+            embedding = get_face_embedding(image)
+            embedding_data[person].append(embedding)
+    return embedding_data
+
 def main(args):
     """ Main entry point of the app """
     if args.mode == 'transform' and args.directory != None:
         name_list = get_names(args.directory)
-        print(get_person_images(args.directory, name_list))
+        print(create_embedding_data(args.directory, name_list))
 
 
 if __name__ == "__main__":
