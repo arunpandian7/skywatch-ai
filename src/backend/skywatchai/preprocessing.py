@@ -7,12 +7,6 @@ import math
 from PIL import Image
 import cv2
 
-model = loadModel()
-input_shape = model.layers[0].input_shape
-try:
-    image_size = input_shape[0][1:3]
-except:
-    image_size = input_shape[1:3]
 
 def align_face(img, left_eye, right_eye):
     # Alignment is done by rotation with respect to Left and Right Eye
@@ -77,8 +71,8 @@ def get_processed_face(img, target_size, enforce=True):
 
     return processed_img
 
-def get_face_embedding(path):
+def get_face_embedding(path, model, input_shape):
     img = read_img(path)
-    processed_img = get_processed_face(img, image_size, enforce=True)
+    processed_img = get_processed_face(img, input_shape, enforce=True)
     embedding = l2_normalization(model.predict(processed_img)[0, :])
     return embedding
