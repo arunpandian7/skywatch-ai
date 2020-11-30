@@ -2,8 +2,8 @@ import os
 import glob
 import pickle
 from annoy import AnnoyIndex
-from .model.FaceNet import loadmodel
 from .preprocessing import get_face_embedding
+from .model.FaceNet import load_facenet
 from .utils import getEuclideanDistance
 
 def get_people_names(dir):
@@ -28,7 +28,7 @@ def get_image_paths(dir):
 
 class FaceID():
     def __init__(self, dir, enforce_detection=True) -> None:
-        self.emb_model = loadmodel()
+        self.emb_model = load_facenet()
         self.threshold = 0.80
         self.enforce_detection = enforce_detection
         self.dir = dir
@@ -51,20 +51,23 @@ class FaceID():
         image_paths = get_image_paths(self.dir)
         i = 1
         person_id_map = {}
-        for person, images in image_paths:
+        for person, images in image_paths.items():
             for image in images:
                 embedding = get_face_embedding(image, self.emb_model, self.image_size)
                 face_tree.add_item(i, embedding)
                 person_id_map[i] = person
                 i += 1
         face_tree.build(5)
+        print('ANN Tree Built Successfully')
         try:
             face_tree.save(self.emb_save_path)
             save_file = open('../../database/personMap.pickle', 'wb')
             pickle.dump(person_id_map, save_file)
             save_file.close()
+            print('Files saved successfully in the drive')
         except:
-            SystemError('Cannot save data files')
+            raise SystemError('Cannot save data files')
+    
     
     
 

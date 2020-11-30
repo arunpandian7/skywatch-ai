@@ -1,5 +1,4 @@
 from mtcnn import MTCNN
-from model.FaceNet import loadModel
 from .utils import getEuclideanDistance, read_img, l2_normalization
 
 import numpy as np
