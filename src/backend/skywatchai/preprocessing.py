@@ -1,4 +1,5 @@
 from mtcnn import MTCNN
+from numpy.lib import type_check
 from .utils import getEuclideanDistance, read_img, l2_normalization
 
 import numpy as np
@@ -7,10 +8,12 @@ from PIL import Image
 import cv2
 
 
-def align_face(img, left_eye, right_eye):
+def align_face(img, detector):
+    detection = detector.detect_faces(img)
+    keypoints = detection['keypoints']
     # Alignment is done by rotation with respect to Left and Right Eye
-    left_eye_x, left_eye_y = left_eye
-    right_eye_x, right_eye_y = right_eye
+    left_eye_x, left_eye_y = keypoints['left_eye']
+    right_eye_x, right_eye_y = keypoints['right_eye']
 
     # Finding the direction of rotation
     if left_eye_y > right_eye_y:
@@ -39,30 +42,23 @@ def align_face(img, left_eye, right_eye):
         img = np.array(img.rotate(direction * angle))
     return img
 
-def crop_face(img, enforce=True):
-    detector = MTCNN() 
-    detections = detector.detect_faces(img) # Detects Face 
-
+def get_faces(img, detector, enforce=True):
+    if not type(img) == np.ndarray:
+        img = read_img(img)
+    face_imgs = []
+    detections = detector.detect_faces(img)
     if len(detections) > 0:
-        detection = detections[0]
-        keypoints = detection["keypoints"]
-        left_eye = keypoints["left_eye"]
-        right_eye = keypoints["right_eye"]
-        
-        # Align image w.r.t to Face
-        img = align_face(img, left_eye, right_eye)
-        # Detect Face Image on Aligned Image to crop the Face Portion
-        detections = detector.detect_faces(img)
-        x, y, w, h = detection['box']
-        cropped_face = img[int(y): int(y+h), int(x) : int(x+w)]
-        return cropped_face
+        for face in detections:
+            x, y, w, h = face['box']
+            cropped_face = img[int(y): int(y+h), int(x) : int(x+w)]
+            face_imgs.append(cropped_face)
+        return face_imgs
     else:
         if enforce != True:
             return img
         raise ValueError('Face could not be detected please check the image.')
 
-def get_processed_face(img, target_size, enforce=True):
-    img = crop_face(img, enforce=enforce)
+def preprocess_image(img, target_size):
 
     processed_img = cv2.resize(img, target_size)
     processed_img = np.expand_dims(processed_img, axis=0)
@@ -70,8 +66,10 @@ def get_processed_face(img, target_size, enforce=True):
 
     return processed_img
 
-def get_face_embedding(path, model, input_shape):
-    img = read_img(path)
-    processed_img = get_processed_face(img, input_shape, enforce=True)
+def get_face_embedding(img, model, input_shape, enforce=True):
+    if not type(img) == np.ndarray:
+        img = read_img(img)
+        img = crop_face(img, enforce=enforce)
+    processed_img = preprocess_image(img, input_shape)
     embedding = l2_normalization(model.predict(processed_img)[0, :])
     return embedding
