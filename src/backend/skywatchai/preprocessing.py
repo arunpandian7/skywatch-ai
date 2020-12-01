@@ -47,14 +47,15 @@ def align_face(img, detector):
 def get_faces(img, detector, enforce=True):
     if not type(img) == np.ndarray:
         img = read_img(img)
-    face_imgs = []
+    faces = []
     detections = detector.detect_faces(img)
     if len(detections) > 0:
         for face in detections:
             x, y, w, h = face['box']
             cropped_face = img[int(y): int(y+h), int(x) : int(x+w)]
-            face_imgs.append(cropped_face)
-        return face_imgs
+            face['image'] = cropped_face
+            faces.append(face)
+        return faces
     else:
         if enforce != True:
             return img
