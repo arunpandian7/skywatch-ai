@@ -2,7 +2,8 @@ import os
 import glob
 import pickle
 from annoy import AnnoyIndex
-from .preprocessing import get_face_embedding
+from mtcnn.mtcnn import MTCNN
+from .preprocessing import align_face, get_face_embedding, get_faces
 from .model.FaceNet import load_facenet
 from .utils import getEuclideanDistance
 
@@ -28,11 +29,12 @@ def get_image_paths(dir):
 
 class FaceID():
     def __init__(self, dir, enforce_detection=True) -> None:
+        self.detector = MTCNN()
         self.emb_model = load_facenet()
         self.threshold = 0.80
         self.enforce_detection = enforce_detection
         self.dir = dir
-        self.emb_save_path = os.path.join(dir, 'face_embeds.ann')
+        self.emb_save_path = os.path.join('../../database', 'face_embeds.ann')
         input_shape = self.emb_model.layers[0].input_shape
         self.embedding_size = 128
         try:
@@ -53,7 +55,9 @@ class FaceID():
         person_id_map = {}
         for person, images in image_paths.items():
             for image in images:
-                embedding = get_face_embedding(image, self.emb_model, self.image_size)
+                faces = get_faces(image, self.detector, enforce=True)
+                aligned_face = align_face(faces[-1], self.detector)
+                embedding = get_face_embedding(aligned_face, self.emb_model, self.image_size)
                 face_tree.add_item(i, embedding)
                 person_id_map[i] = person
                 i += 1

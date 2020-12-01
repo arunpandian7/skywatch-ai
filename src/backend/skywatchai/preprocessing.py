@@ -11,9 +11,11 @@ import cv2
 def align_face(img, detector):
     detection = detector.detect_faces(img)
     keypoints = detection['keypoints']
+    left_eye = keypoints['left_eye']
+    right_eye = keypoints['right_eye']
     # Alignment is done by rotation with respect to Left and Right Eye
-    left_eye_x, left_eye_y = keypoints['left_eye']
-    right_eye_x, right_eye_y = keypoints['right_eye']
+    left_eye_x, left_eye_y = left_eye
+    right_eye_x, right_eye_y = right_eye
 
     # Finding the direction of rotation
     if left_eye_y > right_eye_y:
@@ -66,10 +68,9 @@ def preprocess_image(img, target_size):
 
     return processed_img
 
-def get_face_embedding(img, model, input_shape, enforce=True):
+def get_face_embedding(img, model, input_shape):
     if not type(img) == np.ndarray:
         img = read_img(img)
-        img = crop_face(img, enforce=enforce)
     processed_img = preprocess_image(img, input_shape)
     embedding = l2_normalization(model.predict(processed_img)[0, :])
     return embedding
