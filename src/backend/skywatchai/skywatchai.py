@@ -59,8 +59,13 @@ class FaceID():
         for person, images in image_paths.items():
             for image in images:
                 faces = get_faces(image, self.detector, enforce=True)
-                aligned_face = align_face(faces[-1]['image'], self.detector)
-                embedding = get_face_embedding(aligned_face, self.emb_model, self.image_size)
+                try:
+                    aligned_face = align_face(faces[0]['image'], self.detector)
+                    embedding = get_face_embedding(aligned_face, self.emb_model, self.image_size)
+                except IndexError:
+                    raise AssertionError('Could not detect face in '+ image)
+                except TypeError:
+                    raise TypeError(f"Got an null object for {person} and {image}")
                 face_tree.add_item(i, embedding)
                 person_id_map[i] = person
                 i += 1
@@ -86,14 +91,14 @@ class FaceID():
             raise FileNotFoundError("File cannot be reached, check the file path")
 
     def find_people(self, image):
-        faces = get_faces(image)
+        faces = get_faces(image, self.detector)
         found = []
         for face in faces:
             emb = get_face_embedding(face['image'], self.emb_model, self.image_size)
             result = self.face_tree.get_nns_by_vector(emb, 1, include_distances=True)
             id, distance = result
-            if distance < 0.8:
-                face['name'] = self.personMap[id]
+            if distance[0] < 0.8:
+                face['name'] = self.personMap[id[0]]
             else:
                 face['name'] = self.unknownName
             found.append(face)
