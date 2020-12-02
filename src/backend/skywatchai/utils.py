@@ -11,6 +11,9 @@ def l2_normalization(x):
     return x / np.sqrt(np.sum(np.multiply(x, x)))
 
 def read_img(path):
-    img = cv2.imread(path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    return img
+    try:
+        img = cv2.imread(path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        return img
+    except:
+        raise AssertionError('Could not read image in +'+path)
