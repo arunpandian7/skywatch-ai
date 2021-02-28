@@ -530,7 +530,7 @@ def InceptionResNetV2():
 
 	return model
 
-def load_facenet(url = 'https://drive.google.com/uc?id=1971Xk5RwedbudGgTIrGAL4F7Aifu7id1'):
+def load_model(url = 'https://drive.google.com/uc?id=1971Xk5RwedbudGgTIrGAL4F7Aifu7id1'):
 	model = InceptionResNetV2()
 	
 	#-----------------------------------
