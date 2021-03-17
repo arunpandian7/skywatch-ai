@@ -97,6 +97,6 @@ def find_people(self, image, embeds_db, name_map):
         if distance[0] < 0.8:
             face['name'] = name_map[id[0]]
         else:
-            face['name'] = 
+            face['name'] = unknown_token
         found_people.append(face)
     return found_people
