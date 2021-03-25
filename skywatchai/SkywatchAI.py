@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 import math
 from PIL import Image
 from mtcnn.mtcnn import MTCNN
@@ -40,6 +41,25 @@ def extract_faces(img, enforce=True):
         if enforce != True:
             return img
         raise ValueError('Face could not be detected please check the image.')
+
+def detect_faces(img, enforce=True):
+    faces = extract_faces(img, enforce=enforce)
+    img = read_img(img)
+    for face in faces:
+        if face['confidence'] > 0.1:
+            bbox = face['box']
+            keypoints = face['keypoints']
+            cv2.rectangle(img,
+              (bbox[0], bbox[1]),
+              (bbox[0]+bbox[2], bbox[1] + bbox[3]),
+              (0,155,255),
+              2)
+            cv2.circle(img,(keypoints['left_eye']), 2, (0,155,255), 2)
+            cv2.circle(img,(keypoints['right_eye']), 2, (0,155,255), 2)
+            cv2.circle(img,(keypoints['nose']), 2, (0,155,255), 2)
+            cv2.circle(img,(keypoints['mouth_left']), 2, (0,155,255), 2)
+            cv2.circle(img,(keypoints['mouth_right']), 2, (0,155,255), 2)
+    return img
 
 def get_face_embedding(img):
     if not type(img) == np.ndarray:
