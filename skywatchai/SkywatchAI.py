@@ -52,13 +52,13 @@ def detect_faces(img, enforce=True):
             cv2.rectangle(img,
               (bbox[0], bbox[1]),
               (bbox[0]+bbox[2], bbox[1] + bbox[3]),
-              (0,155,255),
+              (36,255,12),
               2)
-            cv2.circle(img,(keypoints['left_eye']), 2, (0,155,255), 2)
-            cv2.circle(img,(keypoints['right_eye']), 2, (0,155,255), 2)
-            cv2.circle(img,(keypoints['nose']), 2, (0,155,255), 2)
-            cv2.circle(img,(keypoints['mouth_left']), 2, (0,155,255), 2)
-            cv2.circle(img,(keypoints['mouth_right']), 2, (0,155,255), 2)
+            cv2.circle(img,(keypoints['left_eye']), 2, (36,255,12), 2)
+            cv2.circle(img,(keypoints['right_eye']), 2, (36,255,12), 2)
+            cv2.circle(img,(keypoints['nose']), 2, (36,255,12), 2)
+            cv2.circle(img,(keypoints['mouth_left']), 2, (36,255,12), 2)
+            cv2.circle(img,(keypoints['mouth_right']), 2, (36,255,12), 2)
     return img
 
 def get_face_embedding(img):
@@ -107,16 +107,32 @@ def align_face(img):
         return img
     
 
-def find_people(self, image, embeds_db, name_map):
-    faces = extract_faces(image, self.detector)
+def find_people(image, embeds_db, name_map, enforce=True):
+    faces = extract_faces(image, enforce=enforce)
     found_people = []
     for face in faces:
-        emb = get_face_embedding(face['image'])
-        result = embeds_db.get_nns_by_vector(emb, 1, include_distances=True)
-        id, distance = result
-        if distance[0] < 0.8:
-            face['name'] = name_map[id[0]]
-        else:
-            face['name'] = unknown_token
-        found_people.append(face)
+        if face['image'].size != 0:
+            emb = get_face_embedding(face['image'])
+            result = embeds_db.get_nns_by_vector(emb, 1, include_distances=True)
+            id, distance = result
+            if distance[0] < 0.9:
+                face['name'] = name_map[id[0]]
+            else:
+                face['name'] = unknown_token
+            found_people.append(face)
     return found_people
+
+def get_annotated_image(img, embeds_db, name_map, enforce=True):
+    faces = find_people(img, embeds_db, name_map, enforce)
+    img = read_img(img)
+    for face in faces:
+        if face['confidence'] > 0.1:
+            bbox = face['box']
+            keypoints = face['keypoints']
+            cv2.rectangle(img,
+                (bbox[0], bbox[1]),
+                (bbox[0]+bbox[2], bbox[1] + bbox[3]),
+                (36,255,12),
+                2)
+            cv2.putText(img, face['name'], (bbox[0], bbox[1]-1), cv2.FONT_HERSHEY_COMPLEX, 0.9, (36,255,12))
+    return img

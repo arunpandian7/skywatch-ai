@@ -6,9 +6,17 @@ from .SkywatchAI import extract_faces, align_face, get_face_embedding
 
 embedding_size = 128
 
-def build_db(dir, embeds_db, name_map_file):
+def build_db(face_path, save_path):
+    """
+    Builds FaceEmbedding Database of people
+
+    Args:
+        face_path (Path): Face Directory Path
+        save_path ([type]): Save Path for SkywatchDB
+    """
+    
     face_tree = AnnoyIndex(embedding_size, 'euclidean')
-    image_paths = _get_image_paths(dir)
+    image_paths = _get_image_paths(face_path)
     i = 1
     person_id_map = {}
     for person, images in image_paths.items():
@@ -26,19 +34,28 @@ def build_db(dir, embeds_db, name_map_file):
             i += 1
     face_tree.build(5)
     try:
-        face_tree.save(embeds_db)
-        save_file = open(name_map_file, 'wb')
+        face_tree.save(save_path+'faceEmbed.db')
+        save_file = open(save_path+'nameMap.db', 'wb')
         pickle.dump(person_id_map, save_file)
         save_file.close()
         print('Skywatch Database successfully saved !')
     except:
         raise SystemError('Cannot save data files')
 
-def load_db(embeds_db, name_map_file):
+def load_db(path):
+    """
+    Loads SkywatchDB and returns the Objects
+
+    Args:
+        path(Path) : Path to directory containing database
+
+    Returns:
+        [type]: [description]
+    """
     try:
         face_tree = AnnoyIndex(embedding_size, 'euclidean')
-        face_tree.load(embeds_db)
-        f = open(name_map_file, 'rb')
+        face_tree.load(path+'faceEmbed.db')
+        f = open(path+'nameMap.db', 'rb')
         personMap = pickle.load(f)
         print('Skywatch Database has been successfully loaded and ready')
     except FileNotFoundError:

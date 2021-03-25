@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 
 def preprocess_image(img, target_size):
-
     processed_img = cv2.resize(img, target_size)
     processed_img = np.expand_dims(processed_img, axis=0)
     processed_img = processed_img / 255
