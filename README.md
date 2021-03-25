@@ -1,16 +1,13 @@
 # Skywatch.ai - Facial Recognition System
-Skywatch.ai is an end-to-end facial recogntion platfom powered by deep learning based models giving state-of-the-art inference. It focuses on efficiency and functionality. It comes with a attendance monitoring system with timely alerts and data. 
+Skywatch.ai is an API Wrapper Library for Facial Recongnition System. It focuses on simplicity, efficiency and easy to start access structure. 
 
-
-> 👷‍♂️🔨 Currently this project is under development. You are absolutely welcome to join me in this development process. 
+Please look into this [Tutorial Notebook](https://colab.research.google.com/github/arunpandian7/skywatch-ai/blob/master/sample.ipynb)
 
 ## Dependencies
 - [MTCNN](https://pypi.org/project/mtcnn/)
 - [FaceNet](https://github.com/davidsandberg/facenet)
 - Tensorflow
 - Keras
-- FastAPI (Backend)
-- Postgres (Database)
 - Numpy
 - OpenCV
 
