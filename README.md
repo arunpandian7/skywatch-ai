@@ -2,6 +2,10 @@
 Skywatch.ai is an API wrapper for powerful face detection and recognition models. It enables an efficient and clean way to use these models in your project without having to worry about the backend clusters. The focus of these project is to provide a easy-to-use package that speeds up development of lot of applications and research.
 
 ## Usage
+You can install skywatchai using [PyPi](https://pypi.org/project/skywatchai/)
+```
+pip install skywatchai
+```
 
 ### Face Detection
 ```python
@@ -9,7 +13,7 @@ import skywatchai.SkywatchAI as skai
 img_path = 'test/oscar.jpg'
 detected = skai.detect_faces(img_path)
 ```
-<img src="asset/face-detect.png" width="60%" align="center" />
+<img src="https://github.com/arunpandian7/skywatch-ai/blob/master/asset/face-detect.png" width="60%" align="center" />
 
 ### Face Verification
 ```python
@@ -18,7 +22,7 @@ img2 = 'test/image2.jpg'
 result = skai.compare(img1, img2)
 print('Are they same person:', result)
 ```
-![Face Verification Result](asset/face-verify-1.png)
+![Face Verification Result](https://github.com/arunpandian7/skywatch-ai/blob/master/asset/face-verify-1.png)
 
 ### Face Recognition
 #### Building the Database
@@ -51,7 +55,7 @@ faceDB, nameMap = skdb.load_db(path='database/')
 ```python
 annot_img = skai.find_people(img, faceDB, nameMap)
 ```
-<img src="asset/face-recogn.png" width="60%" align="center" />
+<img src="https://github.com/arunpandian7/skywatch-ai/blob/master/asset/face-recogn.png" width="60%" align="center" />
 
 ## Dependencies
 - [MTCNN](https://pypi.org/project/mtcnn/)
