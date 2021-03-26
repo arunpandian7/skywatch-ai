@@ -2,7 +2,7 @@ import os
 import glob
 import pickle
 from annoy import AnnoyIndex
-from .SkywatchAI import extract_faces, align_face, get_face_embedding
+from .SkywatchAI import get_faces, align_face, get_face_embedding
 
 embedding_size = 128
 
@@ -21,7 +21,7 @@ def build_db(face_path, save_path):
     person_id_map = {}
     for person, images in image_paths.items():
         for image in images:
-            faces = extract_faces(image, enforce=True)
+            faces = get_faces(image, enforce=True)
             try:
                 aligned_face = align_face(faces[0]['image'])
                 embedding = get_face_embedding(aligned_face)
@@ -50,7 +50,8 @@ def load_db(path):
         path(Path) : Path to directory containing database
 
     Returns:
-        [type]: [description]
+        annoy.tree : Facial Embedding Database Tree 
+        dict       : Person Name to ID Map for Database Tree
     """
     try:
         face_tree = AnnoyIndex(embedding_size, 'euclidean')
