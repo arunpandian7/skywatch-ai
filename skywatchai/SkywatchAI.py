@@ -47,8 +47,7 @@ def detect_faces(img, enforce=True):
         cv2.Image : Annotated Image
     """
     faces = get_faces(img, enforce=enforce)
-    if not type(img) == np.ndarray:
-        img = read_img(img)
+    img = read_img(img)
     for face in faces:
         if face['confidence'] > 0.1:
             bbox = face['box']
@@ -76,8 +75,7 @@ def get_faces(img, enforce=True):
     Returns:
         list: List of Dictionary with cropped face with other informations
     """
-    if not type(img) == np.ndarray:
-        img = read_img(img)
+    img = read_img(img)
     faces = []
     detections = detector.detect_faces(img)
     if len(detections) > 0:
@@ -103,8 +101,7 @@ def get_face_embedding(img):
     Returns:
         np.array : Embedding Vector (128-Dim) of a face
     """
-    if not type(img) == np.ndarray:
-        img = read_img(img)
+    img = read_img(img)
     processed_img = preprocess_image(img, image_shape)
     embedding = l2_normalization(embedder.predict(processed_img)[0, :])
     return embedding

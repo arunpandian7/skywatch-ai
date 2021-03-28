@@ -17,10 +17,13 @@ def getEuclideanDistance(a, b):
 def l2_normalization(x):
     return x / np.sqrt(np.sum(np.multiply(x, x)))
 
-def read_img(path):
+def read_img(img):
     try:
-        img = cv2.imread(path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        return img
+        if not type(img) == np.ndarray:
+            img = cv2.imread(img)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            return img
+        else:
+            return img
     except:
-        raise AssertionError('Could not read image in +'+path)
+        raise AssertionError('Could not read image in '+img)
