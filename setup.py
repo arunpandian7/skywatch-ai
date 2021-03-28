@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="skywatchai",  
-    version="0.0.2",
+    version="0.0.3",
     author="Arun Pandian R",
     author_email="arunrk7.leo@gmail.com",
     description="An API Wrapper for powerful face detection, verification and recongition for python",
