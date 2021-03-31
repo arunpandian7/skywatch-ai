@@ -33,3 +33,8 @@ async def get_recognitions(img: UploadFile = File(...)):
     img = process_image(img)
     annotImage = skai.find_people(img, faceDB, nameMap)
     return StreamingResponse(io.BytesIO(annotImage.tobytes()), media_type="image/png")
+    
+@app.post('/build-db')
+async def build_db(path: str):
+    skdb.build_db(path, path)
+    return "Skywatch FaceDB successfully built"
