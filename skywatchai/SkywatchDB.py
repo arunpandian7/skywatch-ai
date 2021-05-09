@@ -28,7 +28,8 @@ def build_db(face_path, save_path):
             except IndexError:
                 raise AssertionError('Could not detect face in '+ image)
             except TypeError:
-                raise TypeError(f"Got an null object for {person} and {image}")
+                print(f"Cannot detect face for {person} in {image}")
+                continue
             face_tree.add_item(i, embedding)
             person_id_map[i] = person
             i += 1

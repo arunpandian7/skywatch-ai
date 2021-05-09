@@ -17,6 +17,12 @@ from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.layers import add
 from tensorflow.keras import backend as K
 
+import tensorflow as tf
+tf_version = int(tf.__version__.split(".")[0])
+if tf_version == 2:
+	import logging
+	tf.get_logger().setLevel(logging.ERROR)
+
 def scaling(x, scale):
 	return x * scale
 

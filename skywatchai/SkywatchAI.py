@@ -1,3 +1,10 @@
+import warnings
+warnings.filterwarnings("ignore")
+
+import os
+#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 import cv2
 import math
 import numpy as np
@@ -87,7 +94,7 @@ def get_faces(img, enforce=True):
         return faces
     else:
         if enforce != True:
-            return img
+            return faces
         raise ValueError('Face could not be detected please check the image.')
 
 
@@ -169,17 +176,22 @@ def get_people(image, embeds_db, name_map, enforce=True):
     """
     faces = get_faces(image, enforce=enforce)
     found_people = []
-    for face in faces:
-        if face['image'].size != 0:
-            emb = get_face_embedding(face['image'])
-            result = embeds_db.get_nns_by_vector(emb, 1, include_distances=True)
-            id, distance = result
-            if distance[0] < 0.8:
-                face['name'] = name_map[id[0]]
-            else:
-                face['name'] = unknown_token
-            found_people.append(face)
+    if faces != []:
+        for face in faces:
+            if face['image'].size != 0:
+                emb = get_face_embedding(face['image'])
+                result = embeds_db.get_nns_by_vector(emb, 1, include_distances=True)
+                id, distance = result
+                if distance[0] < 0.8:
+                    face['name'] = name_map[id[0]]
+                else:
+                    face['name'] = unknown_token
+                found_people.append(face)
     return found_people
+
+def get_names(image, embeds_db, name_map, enforce=True):
+    people = get_people(image, embeds_db, name_map, enforce=enforce)
+    return [i['name'] for i in people]
 
 def find_people(img, embeds_db, name_map, enforce=True):
     """
