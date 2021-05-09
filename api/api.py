@@ -7,11 +7,11 @@ from utils import process_image
 from starlette.responses import StreamingResponse
 
 app = FastAPI(title="skywatch.ai", debug=True)
-faceDB, nameMap = skdb.load_db('../database/')
+faceDB, nameMap = skdb.load_db('database/')
 
 @app.get('/')
 async def root():
-    return {"message", "Hello World"}
+    return {"message", "SkywatchAI API"}
 
 @app.post('/detections')
 async def get_detections(img : UploadFile = File(...)):
