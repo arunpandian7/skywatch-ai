@@ -1,6 +1,11 @@
+from ast import parse
 import os
 import glob
+from os import path
 import pickle
+import pathlib
+
+from skywatchai.utils import parse_path
 from annoy import AnnoyIndex
 from .SkywatchAI import get_faces, align_face, get_face_embedding
 
@@ -14,6 +19,10 @@ def build_db(face_path, save_path):
         face_path (Path): Face Directory Path
         save_path ([type]): Save Path for SkywatchDB
     """
+    face_path = parse_path(face_path)
+    save_path = parse_path(save_path)
+
+    print("SkywatchDB Build Started...")
     
     face_tree = AnnoyIndex(embedding_size, 'euclidean')
     image_paths = _get_image_paths(face_path)
@@ -35,13 +44,13 @@ def build_db(face_path, save_path):
             i += 1
     face_tree.build(5)
     try:
-        face_tree.save(save_path+'faceEmbed.db')
-        save_file = open(save_path+'nameMap.db', 'wb')
+        face_tree.save(save_path.joinpath('faceEmbed.db').as_posix())
+        save_file = open(save_path.joinpath('nameMap.db').as_posix(), 'wb')
         pickle.dump(person_id_map, save_file)
         save_file.close()
-        print('Skywatch Database successfully saved !')
+        print('SkywatchDB successfully saved at ', save_path.as_posix())
     except:
-        raise SystemError('Cannot save data files')
+        raise SystemError('Storage Access Error. Cannot save Skywatch Database.')
 
 def load_db(path):
     """
@@ -54,10 +63,11 @@ def load_db(path):
         annoy.tree : Facial Embedding Database Tree 
         dict       : Person Name to ID Map for Database Tree
     """
+    path = parse_path(path)
     try:
         face_tree = AnnoyIndex(embedding_size, 'euclidean')
-        face_tree.load(path+'faceEmbed.db')
-        f = open(path+'nameMap.db', 'rb')
+        face_tree.load(path.joinpath('faceEmbed.db').as_posix())
+        f = open(path.joinpath('nameMap.db').as_posix(), 'rb')
         personMap = pickle.load(f)
         print('Skywatch Database has been successfully loaded and ready')
     except FileNotFoundError:
@@ -65,22 +75,18 @@ def load_db(path):
     return face_tree, personMap
 
 
-def _get_people_names(dir):
+def _get_people_names(dir:pathlib.Path):
     try:
         names = os.listdir(dir)
     except FileNotFoundError:
-        raise FileNotFoundError("Couldn't find the image in directories. \
-                Please check with the instruction on how to model the folder")
-    if '.gitkeep' in names:
-        names.remove('.gitkeep')
-        return names
+        raise FileNotFoundError("Couldn't find the image in directories")
     return names
 
-def _get_image_paths(dir):
+def _get_image_paths(dir:pathlib.Path):
     names = _get_people_names(dir)
     image_data = {}
     for name in names:
-        person_img_path = os.path.join(dir, name)
-        image_data[name] = glob.glob(person_img_path+'/*.jpg')
-        image_data[name].extend(glob.glob(person_img_path+'/*.png'))
+        person_img_path = dir.joinpath(name)
+        image_data[name] = [i for i in person_img_path.glob("*.jpg")]
+        image_data[name].extend([i for i in person_img_path.glob("*.png")])
     return image_data

@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import pathlib
 
 def preprocess_image(img, target_size):
     processed_img = cv2.resize(img, target_size)
@@ -20,10 +21,14 @@ def l2_normalization(x):
 def read_img(img):
     try:
         if not type(img) == np.ndarray:
-            img = cv2.imread(img)
+            img = parse_path(img)
+            img = cv2.imread(img.as_posix())
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             return img
         else:
             return img
     except:
-        raise AssertionError('Could not read image in '+img)
+        raise AssertionError('Could not read image in '+ img)
+
+def parse_path(path):
+    return pathlib.Path(path)
